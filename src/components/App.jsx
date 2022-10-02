@@ -43,7 +43,3 @@ export class App extends Component {
     );
   }
 }
-
-{
-  /* <Form onSubmit={this.formSubmitHandler} /> */
-}
