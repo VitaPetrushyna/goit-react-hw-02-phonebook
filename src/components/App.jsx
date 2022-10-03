@@ -1,7 +1,9 @@
 import { Component } from 'react';
 import { nanoid } from 'nanoid';
-import Form from './ContactForm/ContactForm';
+import ContactForm from './ContactForm/ContactForm';
+import Filter from './Filter/Filter';
 import ContactList from './ContactList/ContactList';
+import { HeaderTitle, Title } from './App.styled';
 
 export class App extends Component {
   state = {
@@ -15,30 +17,67 @@ export class App extends Component {
   };
 
   addContact = text => {
-    // const contacts = this.state.contacts;
+    console.log(text);
+
     const contact = {
       id: nanoid(),
-      text,
-      comleted: false,
+      name: text.name,
+      number: text.number,
     };
+
+    const duplicateName = this.state.contacts.find(
+      oldContact => oldContact.name === contact.name
+    );
+
+    if (duplicateName) {
+      alert(`${contact.name} is already on contacts`);
+      return;
+    }
+
     this.setState(({ contacts }) => ({
       contacts: [...contacts, contact],
     }));
   };
 
-  formSubmitHandler = data => {
-    console.log(data);
+  deleteContact = contactId => {
+    this.setState(prevState => {
+      return {
+        contacts: prevState.contacts.filter(({ id }) => id !== contactId),
+      };
+    });
+  };
+
+  changeFilter = event => {
+    this.setState({ filter: event.currentTarget.value });
+  };
+
+  getVisibleContacts = () => {
+    const { contacts, filter } = this.state;
+
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
   };
 
   render() {
+    const { filter } = this.state;
+    const visibleContacts = this.getVisibleContacts();
+
     return (
       <>
-        <h1>Phonebook</h1>
-        <Form onSubmit={this.addContact} />
-        <div>
-          <h2>Contacts</h2>
-          <ContactList contacts={this.state.contacts} />
-        </div>
+        <HeaderTitle>Phonebook</HeaderTitle>
+        <ContactForm onSubmit={this.addContact} />
+        <Title>Contacts</Title>
+
+        <Filter value={filter} onChange={this.changeFilter} />
+
+        {visibleContacts.length > 0 && (
+          <ContactList
+            contacts={visibleContacts}
+            onDeleteContact={this.deleteContact}
+          />
+        )}
       </>
     );
   }
