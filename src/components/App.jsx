@@ -26,7 +26,7 @@ export class App extends Component {
     };
 
     const duplicateName = this.state.contacts.find(
-      oldContact => oldContact.name === contact.name
+      oldContact => oldContact.name === contact.name.toLowerCase()
     );
 
     if (duplicateName) {
